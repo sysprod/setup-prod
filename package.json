@@ -1,31 +1,33 @@
 {
-  "name": "typescript-action",
+  "name": "setup-prod",
   "version": "0.0.0",
   "private": true,
-  "description": "TypeScript template action",
+  "description": "Setup Prod CLI for GitHub Actions",
   "main": "lib/main.js",
-  "scripts": {
-    "build": "tsc",
-    "format": "prettier --write **/*.ts",
-    "format-check": "prettier --check **/*.ts",
-    "lint": "eslint src/**/*.ts",
-    "package": "ncc build --source-map --license licenses.txt",
-    "test": "jest",
-    "all": "npm run build && npm run format && npm run lint && npm run package && npm test"
-  },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/typescript-action.git"
+    "url": "git+https://github.com/sysprod/setup-prod.git"
   },
   "keywords": [
     "actions",
     "node",
-    "setup"
+    "setup",
+    "prod",
+    "sysprod",
+    "devops",
+    "tool",
+    "cicd"
   ],
-  "author": "",
-  "license": "MIT",
+  "author": "Sysprod",
+  "license": "MPL-2.0",
   "dependencies": {
-    "@actions/core": "^1.2.5"
+    "@actions/core": "^1.2.5",
+    "@actions/github": "^4.0.0",
+    "@actions/http-client": "^1.0.8",
+    "@actions/io": "^1.0.2",
+    "@actions/tool-cache": "^1.6.0",
+    "@octokit/rest": "^18.0.6",
+    "ts-node": "^9.0.0"
   },
   "devDependencies": {
     "@types/jest": "^26.0.10",
