@@ -1,6 +1,6 @@
 import * as core from '@actions/core'
 import * as tc from '@actions/tool-cache'
-import * as io from '@actions/io'
+import * as exec from '@actions/exec'
 import {Octokit} from '@octokit/rest'
 import path from 'path'
 import os from 'os'
@@ -12,7 +12,8 @@ const app = 'prod'
 
   Dev mode:
     1. export RUNNER_TEMP="$(mktemp -d)"
-    2. ts-node src/main.ts
+    2. export RUNNER_TOOL_CACHE="$(mktemp -d)"
+    3. ts-node src/main.ts
 
     Setting inputs:
     - export INPUT_VERSION
@@ -38,33 +39,46 @@ async function run(): Promise<void> {
     const platform: string = os.platform()
     const arch: string = golangArch(os.arch())
 
-    core.debug(`platform: ${platform}, arch: ${arch}, version: ${version}`)
+    core.info(`platform: ${platform}, arch: ${arch}, version: ${version}`)
 
-    const url = constructURL(base, app, platform, arch, version)
-    core.debug(`download url: ${url.toString()}`)
-
-    const src = await tc.downloadTool(url.toString())
-    core.debug(`download path: ${src}`)
+    let src: string = tc.find(app, version)
+    if (!src) {
+      src = await install(base, app, platform, arch, version)
+    }
+    core.info(`Cached ${src}`)
 
     const dir = path.dirname(src)
-
-    let dest: string
-    switch (platform) {
-      case 'win32':
-        dest = path.join(dir, `${app}.exe`)
-        break
-      default:
-        dest = path.join(dir, app)
-    }
-
-    core.debug(`moving ${src} to ${dest}`)
-    io.mv(src, dest)
-    core.addPath(dest)
+    core.debug(`adding ${dir} to PATH`)
+    core.addPath(dir)
 
     core.debug(new Date().toTimeString())
   } catch (error) {
     core.setFailed(error.message)
   }
+}
+
+async function install(
+  base: URL,
+  name: string,
+  platform: string,
+  arch: string,
+  version: string
+): Promise<string> {
+  const url = constructURL(base, name, platform, arch, version)
+  const src: string = await tc.downloadTool(url.toString())
+
+  let bin: string
+  switch (platform) {
+    case 'win32':
+      bin = `${app}.exe`
+      break
+    default:
+      await exec.exec(`chmod u+x ${src}`)
+      bin = app
+  }
+
+  const cachedir: string = await tc.cacheFile(src, bin, app, version)
+  return path.join(cachedir, bin)
 }
 
 async function latestVersion(owner: string, repo: string): Promise<string> {

@@ -1430,7 +1430,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(__webpack_require__(186));
 const tc = __importStar(__webpack_require__(784));
-const io = __importStar(__webpack_require__(436));
+const exec = __importStar(__webpack_require__(514));
 const rest_1 = __webpack_require__(375);
 const path_1 = __importDefault(__webpack_require__(622));
 const os_1 = __importDefault(__webpack_require__(87));
@@ -1440,7 +1440,8 @@ const app = 'prod';
 
   Dev mode:
     1. export RUNNER_TEMP="$(mktemp -d)"
-    2. ts-node src/main.ts
+    2. export RUNNER_TOOL_CACHE="$(mktemp -d)"
+    3. ts-node src/main.ts
 
     Setting inputs:
     - export INPUT_VERSION
@@ -1462,28 +1463,37 @@ function run() {
             const base = new URL(base_url);
             const platform = os_1.default.platform();
             const arch = golangArch(os_1.default.arch());
-            core.debug(`platform: ${platform}, arch: ${arch}, version: ${version}`);
-            const url = constructURL(base, app, platform, arch, version);
-            core.debug(`download url: ${url.toString()}`);
-            const src = yield tc.downloadTool(url.toString());
-            core.debug(`download path: ${src}`);
-            const dir = path_1.default.dirname(src);
-            let dest;
-            switch (platform) {
-                case 'win32':
-                    dest = path_1.default.join(dir, `${app}.exe`);
-                    break;
-                default:
-                    dest = path_1.default.join(dir, app);
+            core.info(`platform: ${platform}, arch: ${arch}, version: ${version}`);
+            let src = tc.find(app, version);
+            if (!src) {
+                src = yield install(base, app, platform, arch, version);
             }
-            core.debug(`moving ${src} to ${dest}`);
-            io.mv(src, dest);
-            core.addPath(dest);
+            core.info(`Cached ${src}`);
+            const dir = path_1.default.dirname(src);
+            core.debug(`adding ${dir} to PATH`);
+            core.addPath(dir);
             core.debug(new Date().toTimeString());
         }
         catch (error) {
             core.setFailed(error.message);
         }
+    });
+}
+function install(base, name, platform, arch, version) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const url = constructURL(base, name, platform, arch, version);
+        const src = yield tc.downloadTool(url.toString());
+        let bin;
+        switch (platform) {
+            case 'win32':
+                bin = `${app}.exe`;
+                break;
+            default:
+                yield exec.exec(`chmod u+x ${src}`);
+                bin = app;
+        }
+        const cachedir = yield tc.cacheFile(src, bin, app, version);
+        return path_1.default.join(cachedir, bin);
     });
 }
 function latestVersion(owner, repo) {

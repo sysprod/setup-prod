@@ -1,8 +1,12 @@
-<p align="center">
-  <a href="https://github.com/actions/typescript-action/actions"><img alt="typescript-action status" src="https://github.com/actions/typescript-action/workflows/build-test/badge.svg"></a>
+# setup-prod
+
+<p align="left">
+  <a href="https://github.com/sysprod/setup-prod/actions"><img alt="setup-prod status" src="https://github.com/sysprod/setup-prod/workflows/ci/badge.svg"></a>
 </p>
 
-# Create a JavaScript Action using TypeScript
+## Usage
+
+This TypeScript Github action downloads and installs [Prod](https://github.com/sysprod/prod) CLI in your GitHub Actions workflow.
 
 Use this template to bootstrap the creation of a TypeScript action.:rocket:
 
