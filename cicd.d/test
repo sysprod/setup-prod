@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+export RUNNER_TEMP="$(mktemp -d)"
+export PATH="$(npm bin):$PATH"
+jest

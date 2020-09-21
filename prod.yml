@@ -1,0 +1,28 @@
+project: "sysprod/setup-prod"
+
+workstations:
+  fetch:
+    description: "Download dependencies"
+    inputs: {files: [package.json]}
+    outputs: {files: [package-lock.json]}
+
+  build:        {description: "Build"}
+  format-check: {description: "Check Typescript format"}
+  lint:         {description: "Lint Typescript code"}
+  package:      {description: "Package"}
+  test:         {description: "Test"}
+
+production_lines:
+  default:
+    - { from: [fetch],         to: [build] }
+    - { from: [build],         to: [format-check] }
+    - { from: [format-check],  to: [lint] }
+    - { from: [lint],          to: [package] }
+    - { from: [package],       to: [test] }
+
+  production:
+    - { from: [fetch],               to: [build] }
+    - { from: [build],               to: [format-check, lint] }
+    - { from: [format-check, lint],  to: [package] }
+    - { from: [package],             to: [test] }
+
