@@ -1446,6 +1446,7 @@ const app = 'prod';
     Setting inputs:
     - export INPUT_VERSION
     - export INPUT_BASE_URL
+    - export INPUT_TOKEN
 
   Note:
   - list all platform/arch: go tool dist list
@@ -1454,6 +1455,7 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             core.debug(new Date().toTimeString());
+            const token = core.getInput('token') || '';
             const base_url = core.getInput('base_url') ||
                 'https://github.com/sysprod/prod/releases/download/';
             let version = core.getInput('version');
@@ -1466,7 +1468,7 @@ function run() {
             core.info(`platform: ${platform}, arch: ${arch}, version: ${version}`);
             let src = tc.find(app, version);
             if (!src) {
-                src = yield install(base, app, platform, arch, version);
+                src = yield install(base, app, platform, arch, version, token);
             }
             core.info(`Cached ${src}`);
             const dir = path_1.default.dirname(src);
@@ -1479,10 +1481,14 @@ function run() {
         }
     });
 }
-function install(base, name, platform, arch, version) {
+function install(base, name, platform, arch, version, token) {
     return __awaiter(this, void 0, void 0, function* () {
         const url = constructURL(base, name, platform, arch, version);
-        const src = yield tc.downloadTool(url.toString());
+        let auth = '';
+        if (token) {
+            auth = `Bearer ${token}`;
+        }
+        const src = yield tc.downloadTool(url.toString(), undefined, auth);
         let bin;
         switch (platform) {
             case 'windows':
