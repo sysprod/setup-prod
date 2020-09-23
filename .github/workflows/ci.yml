@@ -15,4 +15,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: sysprod/setup-prod@main
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
       - run: prod --no-cache
