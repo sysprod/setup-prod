@@ -1461,7 +1461,7 @@ function run() {
                 version = yield latestVersion('sysprod', app);
             }
             const base = new URL(base_url);
-            const platform = os_1.default.platform();
+            const platform = golangPlatform(os_1.default.platform());
             const arch = golangArch(os_1.default.arch());
             core.info(`platform: ${platform}, arch: ${arch}, version: ${version}`);
             let src = tc.find(app, version);
@@ -1485,7 +1485,7 @@ function install(base, name, platform, arch, version) {
         const src = yield tc.downloadTool(url.toString());
         let bin;
         switch (platform) {
-            case 'win32':
+            case 'windows':
                 bin = `${app}.exe`;
                 break;
             default:
@@ -1506,6 +1506,12 @@ function latestVersion(owner, repo) {
         });
         return release.tag_name;
     });
+}
+function golangPlatform(platform) {
+    const mappings = {
+        win32: 'windows'
+    };
+    return mappings[platform] || platform;
 }
 function golangArch(arch) {
     const mappings = {

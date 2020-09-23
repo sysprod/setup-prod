@@ -36,7 +36,7 @@ async function run(): Promise<void> {
     }
 
     const base = new URL(base_url)
-    const platform: string = os.platform()
+    const platform: string = golangPlatform(os.platform())
     const arch: string = golangArch(os.arch())
 
     core.info(`platform: ${platform}, arch: ${arch}, version: ${version}`)
@@ -69,7 +69,7 @@ async function install(
 
   let bin: string
   switch (platform) {
-    case 'win32':
+    case 'windows':
       bin = `${app}.exe`
       break
     default:
@@ -89,6 +89,13 @@ async function latestVersion(owner: string, repo: string): Promise<string> {
     type: 'public'
   })
   return release.tag_name
+}
+
+function golangPlatform(platform: string): string {
+  const mappings: {[index: string]: string} = {
+    win32: 'windows'
+  }
+  return mappings[platform] || platform
 }
 
 function golangArch(arch: string): string {
