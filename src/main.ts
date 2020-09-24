@@ -14,13 +14,13 @@ const app = 'prod'
   Dev mode:
     1. export RUNNER_TEMP="$(mktemp -d)"
     2. export RUNNER_TOOL_CACHE="$(mktemp -d)"
+    3. export GITHUB_ACTION="true"
     3. ts-node src/main.ts
 
     Setting inputs:
     - (optional) export INPUT_VERSION
     - (optional) export INPUT_BASE_URL
-    - (optional) export INPUT_TOKEN
-    - (optional) GITHUB_ACTION
+    - (optional) export INPUT_GITHUB_ACTION
 
   Note:
   - list all platform/arch: go tool dist list
@@ -30,6 +30,8 @@ async function run(): Promise<void> {
     core.debug(new Date().toTimeString())
 
     const token: string = await getToken(core.getInput('GITHUB_TOKEN'))
+    const isToken = !!token
+    core.info(`auth token set: ${isToken}`)
 
     const base_url: string =
       core.getInput('base_url') ||
@@ -66,6 +68,7 @@ async function getToken(githubToken: string): Promise<string> {
   if (!githubToken) {
     return ''
   }
+
   const auth = createActionAuth()
   const {token} = await auth()
   return token

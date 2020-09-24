@@ -1475,13 +1475,13 @@ const app = 'prod';
   Dev mode:
     1. export RUNNER_TEMP="$(mktemp -d)"
     2. export RUNNER_TOOL_CACHE="$(mktemp -d)"
+    3. export GITHUB_ACTION="true"
     3. ts-node src/main.ts
 
     Setting inputs:
     - (optional) export INPUT_VERSION
     - (optional) export INPUT_BASE_URL
-    - (optional) export INPUT_TOKEN
-    - (optional) GITHUB_ACTION
+    - (optional) export INPUT_GITHUB_ACTION
 
   Note:
   - list all platform/arch: go tool dist list
@@ -1491,6 +1491,8 @@ function run() {
         try {
             core.debug(new Date().toTimeString());
             const token = yield getToken(core.getInput('GITHUB_TOKEN'));
+            const isToken = !!token;
+            core.info(`auth token set: ${isToken}`);
             const base_url = core.getInput('base_url') ||
                 'https://github.com/sysprod/prod/releases/download/';
             let version = core.getInput('version');
