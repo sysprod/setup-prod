@@ -8,8 +8,8 @@ inputs:
   base_url:
     description: Base url where to download Prod from
     default: https://github.com/sysprod/prod/releases/download/
-  token:
-    description: Github token to download Prod from github package registry allowing higher Github API rate limit
+  GITHUB_TOKEN:
+    description: Github token or personal access token to download Prod from github package registry allowing higher Github API rate limit
 runs:
   using: node12
   main: dist/index.js

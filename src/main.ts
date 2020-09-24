@@ -2,6 +2,7 @@ import * as core from '@actions/core'
 import * as tc from '@actions/tool-cache'
 import * as exec from '@actions/exec'
 import {Octokit} from '@octokit/rest'
+import {createActionAuth} from '@octokit/auth-action'
 import path from 'path'
 import os from 'os'
 
@@ -16,9 +17,10 @@ const app = 'prod'
     3. ts-node src/main.ts
 
     Setting inputs:
-    - export INPUT_VERSION
-    - export INPUT_BASE_URL
-    - export INPUT_TOKEN
+    - (optional) export INPUT_VERSION
+    - (optional) export INPUT_BASE_URL
+    - (optional) export INPUT_TOKEN
+    - (optional) GITHUB_ACTION
 
   Note:
   - list all platform/arch: go tool dist list
@@ -27,7 +29,7 @@ async function run(): Promise<void> {
   try {
     core.debug(new Date().toTimeString())
 
-    const token: string = core.getInput('token') || ''
+    const token: string = await getToken(core.getInput('GITHUB_TOKEN'))
 
     const base_url: string =
       core.getInput('base_url') ||
@@ -35,7 +37,7 @@ async function run(): Promise<void> {
 
     let version: string = core.getInput('version')
     if (version === 'latest' || version === '') {
-      version = await latestVersion('sysprod', app)
+      version = await latestVersion('sysprod', app, token)
     }
 
     const base = new URL(base_url)
@@ -58,6 +60,15 @@ async function run(): Promise<void> {
   } catch (error) {
     core.setFailed(error.message)
   }
+}
+
+async function getToken(githubToken: string): Promise<string> {
+  if (!githubToken) {
+    return ''
+  }
+  const auth = createActionAuth()
+  const {token} = await auth()
+  return token
 }
 
 async function install(
@@ -91,8 +102,17 @@ async function install(
   return path.join(cachedir, bin)
 }
 
-async function latestVersion(owner: string, repo: string): Promise<string> {
-  const client = new Octokit()
+async function latestVersion(
+  owner: string,
+  repo: string,
+  token: string
+): Promise<string> {
+  let auth = ''
+  if (token) {
+    auth = `Bearer ${token}`
+  }
+
+  const client = new Octokit({auth})
   const {data: release} = await client.repos.getLatestRelease({
     owner,
     repo,

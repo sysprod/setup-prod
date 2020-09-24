@@ -56,6 +56,39 @@ module.exports = require("tls");
 
 /***/ }),
 
+/***/ 20:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+var authToken = __webpack_require__(334);
+
+const createActionAuth = function createActionAuth() {
+  if (!process.env.GITHUB_ACTION) {
+    throw new Error("[@octokit/auth-action] `GITHUB_ACTION` environment variable is not set. @octokit/auth-action is meant to be used in GitHub Actions only.");
+  }
+
+  if (!process.env.GITHUB_TOKEN && !process.env.INPUT_GITHUB_TOKEN) {
+    throw new Error("[@octokit/auth-action] `GITHUB_TOKEN` variable is not set. It must be set on either `env:` or `with:`. See https://github.com/octokit/auth-action.js#createactionauth");
+  }
+
+  if (process.env.GITHUB_TOKEN && process.env.INPUT_GITHUB_TOKEN) {
+    throw new Error("[@octokit/auth-action] `GITHUB_TOKEN` variable is set on both `env:` and `with:`. Use either the one or the other. See https://github.com/octokit/auth-action.js#createactionauth");
+  }
+
+  const token = process.env.GITHUB_TOKEN || process.env.INPUT_GITHUB_TOKEN;
+  return authToken.createTokenAuth(token);
+};
+
+exports.createActionAuth = createActionAuth;
+//# sourceMappingURL=index.js.map
+
+
+/***/ }),
+
 /***/ 30:
 /***/ (function(__unusedmodule, exports) {
 
@@ -1432,6 +1465,7 @@ const core = __importStar(__webpack_require__(186));
 const tc = __importStar(__webpack_require__(784));
 const exec = __importStar(__webpack_require__(514));
 const rest_1 = __webpack_require__(375);
+const auth_action_1 = __webpack_require__(20);
 const path_1 = __importDefault(__webpack_require__(622));
 const os_1 = __importDefault(__webpack_require__(87));
 const app = 'prod';
@@ -1444,9 +1478,10 @@ const app = 'prod';
     3. ts-node src/main.ts
 
     Setting inputs:
-    - export INPUT_VERSION
-    - export INPUT_BASE_URL
-    - export INPUT_TOKEN
+    - (optional) export INPUT_VERSION
+    - (optional) export INPUT_BASE_URL
+    - (optional) export INPUT_TOKEN
+    - (optional) GITHUB_ACTION
 
   Note:
   - list all platform/arch: go tool dist list
@@ -1455,12 +1490,12 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             core.debug(new Date().toTimeString());
-            const token = core.getInput('token') || '';
+            const token = yield getToken(core.getInput('GITHUB_TOKEN'));
             const base_url = core.getInput('base_url') ||
                 'https://github.com/sysprod/prod/releases/download/';
             let version = core.getInput('version');
             if (version === 'latest' || version === '') {
-                version = yield latestVersion('sysprod', app);
+                version = yield latestVersion('sysprod', app, token);
             }
             const base = new URL(base_url);
             const platform = golangPlatform(os_1.default.platform());
@@ -1479,6 +1514,16 @@ function run() {
         catch (error) {
             core.setFailed(error.message);
         }
+    });
+}
+function getToken(githubToken) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!githubToken) {
+            return '';
+        }
+        const auth = auth_action_1.createActionAuth();
+        const { token } = yield auth();
+        return token;
     });
 }
 function install(base, name, platform, arch, version, token) {
@@ -1502,9 +1547,13 @@ function install(base, name, platform, arch, version, token) {
         return path_1.default.join(cachedir, bin);
     });
 }
-function latestVersion(owner, repo) {
+function latestVersion(owner, repo, token) {
     return __awaiter(this, void 0, void 0, function* () {
-        const client = new rest_1.Octokit();
+        let auth = '';
+        if (token) {
+            auth = `Bearer ${token}`;
+        }
+        const client = new rest_1.Octokit({ auth });
         const { data: release } = yield client.repos.getLatestRelease({
             owner,
             repo,
