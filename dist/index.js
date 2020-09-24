@@ -1578,10 +1578,10 @@ function golangArch(arch) {
 // constructURL returns the url to download prod
 function constructURL(base, name, platform, arch, version) {
     const bin = [name, platform, arch];
+    let filepath = path_1.default.join(version, bin.join('_'));
     if (platform === 'windows') {
-        bin.push('exe');
+        filepath = `${filepath}.exe`;
     }
-    const filepath = path_1.default.join(version, bin.join('_'));
     core.debug(`filepath: ${filepath}`);
     return new URL(filepath, base);
 }
