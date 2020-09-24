@@ -6,7 +6,8 @@ import * as path from 'path'
 test('test runs', () => {
   const ip = path.join(__dirname, '..', 'lib', 'main.js')
   const options: cp.ExecSyncOptions = {
-    env: process.env
+    env: process.env,
+    stdio: 'inherit'
   }
-  console.log(cp.execSync(`node ${ip}`, options).toString())
+  cp.execSync(`node ${ip}`, options)
 })
