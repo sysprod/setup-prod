@@ -125,6 +125,9 @@ function constructURL(
   version: string
 ): URL {
   const bin = [name, platform, arch]
+  if (platform === 'windows') {
+    bin.push('exe')
+  }
   const filepath = path.join(version, bin.join('_'))
   core.debug(`filepath: ${filepath}`)
   return new URL(filepath, base)
