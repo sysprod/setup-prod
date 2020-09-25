@@ -78,6 +78,8 @@ See [ci.yml](.github/workflows/ci.yml).
 
 ![CI](./prod.png)
 
+(spec: [prod.yml](prod.yml))
+
 Or run individually steps in `cicd.d/`, e.g. `cicd.d/test`
 
 ## Contributing
