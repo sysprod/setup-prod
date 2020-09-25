@@ -14,15 +14,6 @@ workstations:
 
 production_lines:
   default:
-    - { from: [fetch],         to: [build] }
-    - { from: [build],         to: [format-check] }
-    - { from: [format-check],  to: [lint] }
-    - { from: [lint],          to: [package] }
-    - { from: [package],       to: [test] }
-
-  production:
-    - { from: [fetch],               to: [build] }
-    - { from: [build],               to: [format-check, lint] }
-    - { from: [format-check, lint],  to: [package] }
-    - { from: [package],             to: [test] }
-
+    - { from: [fetch],               to: [format-check, lint] }
+    - { from: [format-check, lint],  to: [build] }
+    - { from: [build],               to: [test, package] }
