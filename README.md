@@ -1,10 +1,16 @@
+
+<div align="center">
+
 # setup-prod
 
-<p align="left">
-  <a href="https://github.com/sysprod/setup-prod/actions"><img alt="setup-prod status" src="https://github.com/sysprod/setup-prod/workflows/ci/badge.svg"></a>
-</p>
+Downloads and installs [Sysprod Prod](https://github.com/sysprod/prod) CLI in your GitHub Actions workflow
 
-Downloads and installs [Sysprod Prod](https://github.com/sysprod/prod) CLI in your GitHub Actions workflow.
+[Usage](#usage)&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;[Inputs](#inputs)&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;[Outputs](#ouputs)&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;[Example](#example)&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;[Contributing](#contributing)&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;[License](#license)&nbsp;&nbsp;&nbsp;
+
+
+[![CI Status](https://github.com/sysprod/setup-prod/workflows/ci/badge.svg)](https://github.com/sysprod/setup-prod/actions)
+</div>
 
 ## Usage
 
@@ -14,6 +20,7 @@ The default configuration installs the latest version of Prod CLI.
 ```yaml
 steps:
 - uses: sysprod/setup-prod@v1
+- run: prod --no-cache
 ```
 
 A specific version can be installed, corresponding to the version of a [Prod release](https://github.com/sysprod/prod/releases).
@@ -58,6 +65,13 @@ Set the Action specification [action.yml](action.yml) for more information.
 
 This action has specific output.
 
-## Example:
+## Example
 
 See [ci.yml](.github/workflows/ci.yml).
+
+## Contributing
+Pull-requests, feature requests and issues are welcome.
+
+## License
+[Mozilla Public License Version 2.0](LICENSE)
+
