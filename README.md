@@ -5,9 +5,8 @@
 
 Downloads and installs [Sysprod Prod](https://github.com/sysprod/prod) CLI in your GitHub Actions workflow
 
-[Usage](#usage)&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;[Inputs](#inputs)&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;[Outputs](#ouputs)&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;[Example](#example)&nbsp;&nbsp;&nbsp;
+[Usage](#usage)&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;[Inputs](#inputs)&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;[Outputs](#ouputs)&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;[Example](#example)&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;[Develop](#develop)&nbsp;&nbsp;&nbsp;
 |&nbsp;&nbsp;&nbsp;[Contributing](#contributing)&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;[License](#license)&nbsp;&nbsp;&nbsp;
-
 
 [![CI Status](https://github.com/sysprod/setup-prod/workflows/ci/badge.svg)](https://github.com/sysprod/setup-prod/actions)
 </div>
@@ -16,7 +15,7 @@ Downloads and installs [Sysprod Prod](https://github.com/sysprod/prod) CLI in yo
 
 This action can be run on ubuntu-latest, windows-latest, and macos-latest GitHub Actions runners.
 
-The default configuration installs the latest version of Prod CLI. 
+The default configuration installs the latest version of Prod CLI.
 ```yaml
 steps:
 - uses: sysprod/setup-prod@v1
@@ -69,9 +68,20 @@ This action has specific output.
 
 See [ci.yml](.github/workflows/ci.yml).
 
+## Develop
+### Source
+[main.ts](src/main.ts)
+
+### Run CI/CD locally
+1. Download [Prod](https://github.com/sysprod/prod/releases)
+2. Run: `prod --no-cache`
+
+![CI](./prod.png)
+
+Or run individually steps in `cicd.d/`, e.g. `cicd.d/test`
+
 ## Contributing
 Pull-requests, feature requests and issues are welcome.
 
 ## License
 [Mozilla Public License Version 2.0](LICENSE)
-
